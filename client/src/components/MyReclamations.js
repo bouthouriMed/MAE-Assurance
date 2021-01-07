@@ -26,10 +26,11 @@ import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import Navbar from "./NavbarAuth";
 import {
-  deleteReclamationById,
   getAllReclamations,
+  getMyReclamations,
   getReclamationById,
 } from "../redux/actions/reclamationActions";
+import { TextField } from "@material-ui/core";
 
 function createData(id, firstname, lastname, date, status) {
   return { id, firstname, lastname, date, status };
@@ -98,8 +99,6 @@ function getComparator(order, orderBy) {
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
-
-// const dispatch = useDispatch()
 
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
@@ -249,9 +248,7 @@ const EnhancedTableToolbar = (props) => {
         <Fragment>
           <Tooltip title="Delete">
             <IconButton aria-label="delete">
-              <DeleteIcon
-                // onClick={() => dispatch(deleteReclamationById(row.id))}
-              />
+              <DeleteIcon />
             </IconButton>
           </Tooltip>
         </Fragment>
@@ -301,11 +298,13 @@ const EnhancedTable = (props) => {
   const reclamations = useSelector(
     (state) => state.reclamationReducer.reclamations
   );
+
   const user = useSelector((state) => state.authReducer.user);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllReclamations());
+    dispatch(getMyReclamations());
     setRows(reclamations);
   }, []);
 
@@ -366,7 +365,7 @@ const EnhancedTable = (props) => {
   };
 
   const checkReclamation = (row) => {
-    dispatch(getReclamationById(row.ref, history, user.role));
+    dispatch(getReclamationById(row.ref, history, row.status, user.role));
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
@@ -440,6 +439,13 @@ const EnhancedTable = (props) => {
                                   </IconButton>
                                 </Tooltip>
                                 {row.id}
+                                {row.meetingDate != null && (
+                                  <span>
+                                    {"  "}
+                                    <strong>Meeting Date:</strong>{" "}
+                                    {row.meetingDate}
+                                  </span>
+                                )}
                               </Fragment>
                             </TableCell>
                             <TableCell align="right">

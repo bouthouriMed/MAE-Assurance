@@ -1,20 +1,22 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 
 import { useSelector, useDispatch } from "react-redux";
 
-import { register } from '../redux/actions/authActions'
+import { register } from "../redux/actions/authActions";
 
 import Footer from "./Footer";
-import NavbarAuth from "./NavbarAuth";
+
+import toUpperCase from "../utils/toUpperCase";
+import { toast } from "react-toastify";
 
 function Register() {
   const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
+    firstName: "",
+    lastName: "",
     maritalStatus: "",
     profession: "",
-    username: "",
+    userName: "",
     password1: "",
     password2: "",
     sex: "",
@@ -23,11 +25,11 @@ function Register() {
   });
 
   const {
-    firstname,
-    lastname,
+    firstName,
+    lastName,
     maritalStatus,
     profession,
-    username,
+    userName,
     password1,
     password2,
     sex,
@@ -36,22 +38,46 @@ function Register() {
   } = formData;
 
   const dispatch = useDispatch();
-  // const state = useSelector(state => state.state)
+  const isAuthenticated = useSelector(
+    (state) => state.authReducer.isAuthenticated
+  );
+  const user = useSelector((state) => state.authReducer.appUser);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
+    const userData = {
+      firstName,
+      lastName,
+      maritalStatus,
+      profession,
+      userName,
+      password: password1,
+      sex,
+      role,
+      email,
+    };
     e.preventDefault();
-    dispatch(register(formData))
+    if (password1 == password2) {
+      dispatch(register(userData));
+    } else {
+      toast.error("Password don't match")
+    }
+  };
+
+  if (isAuthenticated == true) {
+    // const Name = toUpperCase(user.firstName);
+    // toast.success(`Welcome ${Name}`);
+    return <Redirect to="/" />;
   }
 
   return (
     <div>
       <div className="login-page">
         <div className="container m-auto">
-          <form className="form-signin mt-4">
+          <form className="form-signin mt-4" onSubmit={handleSubmit}>
             <h1 className="title">Sign Up</h1>
 
             <div className="row">
@@ -61,9 +87,9 @@ function Register() {
                   type="text"
                   className="form-control mb-4"
                   placeholder="Nom"
-                  name="firstname"
+                  name="firstName"
                   onChange={handleChange}
-                  value={firstname}
+                  value={firstName}
                   required
                   autofocus
                 />
@@ -96,9 +122,9 @@ function Register() {
                   type="text"
                   className="form-control mb-4"
                   placeholder="Nom d'utilisateur"
-                  name="username"
+                  name="userName"
                   onChange={handleChange}
-                  value={username}
+                  value={userName}
                   required
                 />
                 <label className="sr-only mb-4">Mot de passe</label>
@@ -124,9 +150,9 @@ function Register() {
                   type="text"
                   className="form-control mb-4"
                   placeholder="Prénom"
-                  name="lastname"
+                  name="lastName"
                   onChange={handleChange}
-                  value={lastname}
+                  value={lastName}
                   required
                   autofocus
                 />
@@ -154,7 +180,8 @@ function Register() {
                     Vous êtes
                   </option>
                   <option value="Adhérant">Adhérent</option>
-                  <option value="Féminin">Agent MAE</option>
+                  <option value="Agent">Agent MAE</option>
+                  <option value="Admin">Admin</option>
                 </select>
                 <label className="sr-only mb-4">Email</label>
                 <input
@@ -181,7 +208,11 @@ function Register() {
               </div>
             </div>
 
-            <button className="btn btn-lg btn-primary btn-block" type="submit" style={{backgroundColor: 'rgb(63,81,181)'}}>
+            <button
+              className="btn btn-lg btn-primary btn-block"
+              type="submit"
+              style={{ backgroundColor: "rgb(63,81,181)" }}
+            >
               Sign up
             </button>
             <p className="mt-5 mb-3 text-muted">

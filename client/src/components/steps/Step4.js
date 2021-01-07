@@ -1,8 +1,53 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getReclamationById } from "../../redux/actions/reclamationActions";
+import { UPDATE_RECLAMATION } from "../../redux/actions/types";
 
 function Step4() {
+  const [formData, setFormData] = useState({
+    isDamagedR: null,
+    isDamagedP: null,
+  });
+
+  const { isDamagedP, isDamagedR } = formData;
+
+  const [damages, setDamages] = useState([]);
+
+  const handleChange = (e, val) => {
+    let list = damages.filter((damage) => damage.probleme === val);
+    if (list.length > 0) {
+      let listOx = damages.filter((damage) => damage.probleme != val);
+      setDamages(listOx);
+    } else if (val === true || val === false) {
+      setFormData({
+        ...formData,
+        [e.target.name]: val,
+      });
+    } else {
+      setDamages([...damages, { probleme: val }]);
+    }
+  };
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.authReducer.user);
+  const reclamation = useSelector(
+    (state) => state.reclamationReducer.reclamation
+  );
+
+  useEffect(() => {
+    if (user.role == "Agent" && reclamation.status == "EN_ATTENTE") {
+      dispatch({
+        type: UPDATE_RECLAMATION,
+        payload: { isDamagedP, isDamagedR, damages },
+      });
+    }
+  }, [user.role == "Agent" && formData, damages]);
+
   return (
-    <form className="form-signin mt-4" style={{border: "dotted black 1px", padding: '25px'}}>
+    <form
+      className="form-signin mt-4"
+      style={{ border: "dotted black 1px", padding: "25px" }}
+    >
       <div className="row">
         <div className="col-12">
           <p className="text-black">Confirmation bien endommagé(s)</p>
@@ -11,8 +56,10 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline1"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Capot")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -25,8 +72,11 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline2"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Para choque avant")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
+                
               />
               <label
                 class="custom-control-label text-secondary"
@@ -39,8 +89,10 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline3"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Porte avant gauche")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -53,8 +105,10 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline4"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Porte arrière gauche")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -67,8 +121,10 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline5"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Porte avant droite")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -81,8 +137,10 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline6"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Porte arrière droite")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -95,8 +153,10 @@ function Step4() {
               <input
                 type="checkbox"
                 id="customRadioInline7"
-                name="customRadioInline1"
+                name="probleme"
+                onClick={(e, val) => handleChange(e, "Far")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -110,7 +170,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline8"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Toit")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -124,7 +186,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline9"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Rétroviseur")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -138,7 +202,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline10"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Aile avant droit")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -152,7 +218,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline11"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Aile avant gauche")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -167,6 +235,8 @@ function Step4() {
                 id="customRadioInline12"
                 name="customRadioInline1"
                 class="custom-control-input"
+                onClick={(e, val) => handleChange(e, "Vitres")}
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -181,6 +251,8 @@ function Step4() {
                 id="customRadioInline13"
                 name="customRadioInline1"
                 class="custom-control-input"
+                onClick={(e, val) => handleChange(e, "Pare brise avant")}
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -194,13 +266,15 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline14"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Aile arrière droit")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
                 for="customRadioInline14"
               >
-                Aile arrière droi
+                Aile arrière droit
               </label>
             </div>
             <div class="custom-control custom-radio custom-control-inline mb-4 mr-4">
@@ -208,7 +282,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline15"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Feu de stop droit")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -222,7 +298,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline16"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Feu de stop gauche")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -236,7 +314,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline17"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Para choque arrière")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -250,7 +330,9 @@ function Step4() {
                 type="checkbox"
                 id="customRadioInline18"
                 name="customRadioInline1"
+                onClick={(e, val) => handleChange(e, "Pneus")}
                 class="custom-control-input"
+                disabled={reclamation.status !== "EN_ATTENTE"}
               />
               <label
                 class="custom-control-label text-secondary"
@@ -269,8 +351,10 @@ function Step4() {
             <input
               type="radio"
               id="customRadioInline111"
-              name="customRadioInline1"
+              name="isDamagedR"
               class="custom-control-input"
+              onClick={(e, val) => handleChange(e, true)}
+              disabled={reclamation.status !== "EN_ATTENTE"}
             />
             <label
               class="custom-control-label text-secondary"
@@ -283,8 +367,10 @@ function Step4() {
             <input
               type="radio"
               id="customRadioInline22"
-              name="customRadioInline1"
+              name="isDamagedR"
               class="custom-control-input"
+              onClick={(e, val) => handleChange(e, false)}
+              disabled={reclamation.status !== "EN_ATTENTE"}
             />
             <label
               class="custom-control-label text-secondary"
@@ -300,8 +386,10 @@ function Step4() {
             <input
               type="radio"
               id="customRadioInline33"
-              name="customRadioInline1"
+              name="isDamagedP"
               class="custom-control-input"
+              onClick={(e, val) => handleChange(e, true)}
+              disabled={reclamation.status !== "EN_ATTENTE"}
             />
             <label
               class="custom-control-label text-secondary"
@@ -314,8 +402,10 @@ function Step4() {
             <input
               type="radio"
               id="customRadioInline44"
-              name="customRadioInline1"
+              name="isDamagedP"
               class="custom-control-input"
+              onClick={(e, val) => handleChange(e, false)}
+              disabled={reclamation.status !== "EN_ATTENTE"}
             />
             <label
               class="custom-control-label text-secondary"

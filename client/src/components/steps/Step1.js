@@ -1,6 +1,52 @@
-import React from "react";
+import { Button } from "@material-ui/core";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addReclamation,
+  confirmReclamation,
+} from "../../redux/actions/reclamationActions";
+import { ADD_RECLAMATION, UPDATE_RECLAMATION } from "../../redux/actions/types";
 
-function Step1({ handleType }) {
+function Step1({ setData }) {
+  const [formData, setFormData] = useState({
+    ref: null,
+    type: "",
+    place: "",
+    accidentDate: "",
+    isDamaged: null,
+    isInjuried: null,
+    conditions: "",
+    witnesses: null,
+    driverName: "",
+    permitLicence1: "",
+  });
+
+  const {
+    place,
+    accidentDate,
+    isDamaged,
+    conditions,
+    witnesses,
+    driverName,
+    permitLicence1,
+  } = formData;
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.authReducer.user);
+  const reclamation = useSelector(
+    (state) => state.reclamationReducer.reclamation
+  );
+
+  useEffect(() => {
+    if (user.role == "Adhérant") {
+      dispatch({ type: ADD_RECLAMATION, payload: formData });
+    }
+  }, [user.role == "Adhérant" && formData]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   return (
     <form className="form-signin mt-4">
       <div className="row">
@@ -11,24 +57,30 @@ function Step1({ handleType }) {
               <input
                 type="radio"
                 id="customRadioInline1"
-                name="customRadioInline1"
+                name="type"
+                value="colision"
+                onChange={handleChange}
                 class="custom-control-input"
+                disabled={user.role == "Agent" ? true : false}
+                required
               />
               <label
                 class="custom-control-label text-secondary"
                 for="customRadioInline1"
-                onChange={() => handleType("col")}
               >
                 Colision
               </label>
             </div>
             <div class="custom-control custom-radio custom-control-inline">
               <input
-                onChange={() => handleType("vol")}
                 type="radio"
                 id="customRadioInline2"
-                name="customRadioInline1"
+                name="type"
+                value="vol"
+                onChange={handleChange}
                 class="custom-control-input"
+                disabled={user.role == "Agent" ? true : false}
+                required
               />
               <label
                 class="custom-control-label text-secondary"
@@ -41,8 +93,12 @@ function Step1({ handleType }) {
               <input
                 type="radio"
                 id="customRadioInline3"
-                name="customRadioInline1"
+                name="type"
+                value="incendie"
+                onChange={handleChange}
                 class="custom-control-input"
+                disabled={user.role == "Agent" ? true : false}
+                required
               />
               <label
                 class="custom-control-label text-secondary"
@@ -55,8 +111,12 @@ function Step1({ handleType }) {
               <input
                 type="radio"
                 id="customRadioInline4"
-                name="customRadioInline1"
+                name="type"
+                value="autres"
+                onChange={handleChange}
                 class="custom-control-input"
+                disabled={user.role == "Agent" ? true : false}
+                required
               />
               <label
                 class="custom-control-label text-secondary"
@@ -73,24 +133,39 @@ function Step1({ handleType }) {
             type="text"
             className="form-control mb-4"
             placeholder="Lieu"
+            name="place"
+            onChange={handleChange}
+            value={place}
             required
+            disabled={user.role == "Agent" ? true : false}
             autofocus
           />
           <label className="sr-only mb-4">
             Dégat Materiel autre que véhicule A et B
           </label>
-          <select className="form-control mb-4">
+          <select
+            className="form-control mb-4"
+            name="isDamaged"
+            onChange={handleChange}
+            value={isDamaged}
+            disabled={user.role == "Agent" ? true : false}
+            required
+          >
             <option value="" disabled selected>
               Dégat Materiel autre que véhicule A et B
             </option>
-            <option value="Oui">Oui</option>
-            <option value="Non">Non</option>
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
           </select>
           <label className="sr-only mb-4">Temoin(s)</label>
           <input
             type="text"
             className="form-control mb-4"
             placeholder="Témoin(s)"
+            name="witnesses"
+            onChange={handleChange}
+            value={witnesses}
+            disabled={user.role == "Agent" ? true : false}
             required
           />
           <label className="sr-only mb-4">Nom & Prénon Conducteur</label>
@@ -98,6 +173,10 @@ function Step1({ handleType }) {
             type="text"
             className="form-control mb-4"
             placeholder="Nom & Prénon Conducteur"
+            name="driverName"
+            onChange={handleChange}
+            value={driverName}
+            disabled={user.role == "Agent" ? true : false}
             required
           />
         </div>
@@ -108,11 +187,22 @@ function Step1({ handleType }) {
             type="date"
             className="form-control mb-4"
             placeholder="Date"
+            name="accidentDate"
+            onChange={handleChange}
+            value={accidentDate}
+            disabled={user.role == "Agent" ? true : false}
             required
             autofocus
           />
           <label className="sr-only mb-4">Circanstances</label>
-          <select className="form-control mb-4">
+          <select
+            className="form-control mb-4"
+            name="conditions"
+            onChange={handleChange}
+            disabled={user.role == "Agent" ? true : false}
+            value={conditions}
+            required
+          >
             <option value="" disabled selected>
               Circanstances
             </option>
@@ -150,6 +240,10 @@ function Step1({ handleType }) {
             type="text"
             className="form-control mb-4"
             placeholder="Numéro permis de conduire"
+            name="permitLicence1"
+            onChange={handleChange}
+            value={permitLicence1}
+            disabled={user.role == "Agent" ? true : false}
             required
           />
 
@@ -161,13 +255,17 @@ function Step1({ handleType }) {
             <div class="custom-control custom-radio custom-control-inline">
               <input
                 type="radio"
-                id="customRadioInline1"
-                name="customRadioInline1"
+                id="customRadioInline11"
+                name="isInjuried"
+                onChange={handleChange}
+                value="true"
                 class="custom-control-input"
+                disabled={user.role == "Agent" ? true : false}
+                required
               />
               <label
                 class="custom-control-label text-secondary"
-                for="customRadioInline1"
+                for="customRadioInline11"
               >
                 Oui
               </label>
@@ -175,13 +273,17 @@ function Step1({ handleType }) {
             <div class="custom-control custom-radio custom-control-inline">
               <input
                 type="radio"
-                id="customRadioInline2"
-                name="customRadioInline1"
+                id="customRadioInline22"
+                name="isInjuried"
+                onChange={handleChange}
+                value="false"
                 class="custom-control-input"
+                disabled={user.role == "Agent" ? true : false}
+                required
               />
               <label
                 class="custom-control-label text-secondary"
-                for="customRadioInline2"
+                for="customRadioInline22"
               >
                 Non
               </label>

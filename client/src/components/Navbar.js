@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { fade, makeStyles } from "@material-ui/core/styles";
@@ -18,6 +19,8 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import { Button } from "@material-ui/core";
 
+import { logout } from "../redux/actions/authActions";
+
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,
@@ -29,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
     display: "none",
     [theme.breakpoints.up("sm")]: {
       display: "block",
+      cursor: "pointer"
     },
   },
   search: {
@@ -85,9 +89,9 @@ const useStyles = makeStyles((theme) => ({
 const Navbar = (props) => {
   const { history } = props;
 
-  const user = {
-    role: 'auth'
-  }
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.authReducer.user);
 
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -124,8 +128,11 @@ const Navbar = (props) => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleMenuClose}>
+        {" "}
+        {user && <span>{user.firstName}</span>}
+      </MenuItem>
+      {/* <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
     </Menu>
   );
 
@@ -165,7 +172,7 @@ const Navbar = (props) => {
         >
           <AccountCircle />
         </IconButton>
-        <p>Profile</p>
+        <p> {user && <span>{user.firstName}</span>}</p>
       </MenuItem>
     </Menu>
   );
@@ -186,6 +193,10 @@ const Navbar = (props) => {
       <Button color="inherit" onClick={() => history.push("/user-reclamation")}>
         Créer une reclamation
       </Button>
+      <Button color="inherit" onClick={() => history.push("/mes-reclamations")}>
+        Mes réclamations
+      </Button>
+
       <IconButton
         edge="end"
         aria-label="account of current user"
@@ -196,11 +207,23 @@ const Navbar = (props) => {
       >
         <AccountCircle />
       </IconButton>
+      <Button color="primary" onClick={() => dispatch(logout())}>
+        Se déconnecter
+      </Button>
     </Fragment>
   );
 
   const agentMenu = (
     <Fragment>
+      <Button
+        color="primary"
+        onClick={() => history.push("/reclamations-table")}
+      >
+        Check Reclamations
+      </Button>
+      <Button color="primary" onClick={() => dispatch(logout())}>
+        Se déconnecter
+      </Button>
       <IconButton aria-label="show 4 new mails" color="inherit">
         <Badge badgeContent={4} color="secondary">
           <MailIcon />
@@ -236,7 +259,7 @@ const Navbar = (props) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" noWrap>
+          <Typography className={classes.title} variant="h6" noWrap onClick={() => history.push('/')}>
             MAE Assurance
           </Typography>
           <div className={classes.search}>
@@ -255,9 +278,9 @@ const Navbar = (props) => {
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             {/* Menu based on user role */}
-            {user.role == "agent" && agentMenu}
-            {user.role == "user" && userMenu}
-            {user.role == "auth" && authMenu}
+            {user && user.role == "Agent" && agentMenu}
+            {user && user.role == "Adhérant" && userMenu}
+            {!user && authMenu}
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
